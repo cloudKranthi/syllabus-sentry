@@ -1,0 +1,24 @@
+# Virtual Environment (crucial - prevents committing thousands of library files)
+.venv/
+*/.venv/
+__pycache__/
+*.py[cod]
+
+# Environment secrets
+.env
+.env.local
+
+# Database / Cache storage
+pgdata/
+redisdata/
+
+# Frontend builds
+node_modules/
+.next/
+dist/
+out/
+
+# OS / Editor artifacts
+.vscode/
+.idea/
+Thumbs.db
