@@ -4,6 +4,11 @@ from sqlalchemy.orm import Mapped,mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID;
 from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey
 from datetime import datetime,timezone,timedelta
+import enum
+from enum import Enum as PGEnum
+class ExamMode(str, enum.Enum):
+    NORMAL = "NORMAL"
+    SURVIVAL = "SURVIVAL"
 class Exam(Base):
     __tablename__="exams"
     id:Mapped[UUID]=mapped_column(
@@ -37,3 +42,8 @@ class Exam(Base):
             onupdate=lambda:datetime.now(timezone.utc),
             nullable=False
         )
+    mode: Mapped[ExamMode] = mapped_column(
+        PGEnum(ExamMode, name="exam_mode_enum", native_enum=False),
+        default=ExamMode.NORMAL,
+        nullable=False,
+    )

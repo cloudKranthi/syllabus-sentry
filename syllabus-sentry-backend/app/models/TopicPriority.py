@@ -23,4 +23,7 @@ class TopicPriority(Base):
         default=lambda:datetime.now(timezone.utc),
         nullable=False
     )
+    frequencyScore:Mapped[int]=mapped_column(Integer)
+    yearsAppeared:Mapped[int]=mapped_column(Integer)
+    occuranceCount:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
    

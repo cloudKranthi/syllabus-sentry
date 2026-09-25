@@ -27,9 +27,9 @@ class ProcessingTask(Base):
         primary_key=True,
         default=uuid4
     )
-    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",delete="CASCADE"),nullable=False,index=True)
-    title:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
-    sourceDocumentid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("documents.id",delete="CASCADE"),nullable=False,index=True)
+    exam_id:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",delete="CASCADE"),nullable=False,index=True)
+    title:Mapped[str]=mapped_column(String(255),index=True,nullable=False,primary_key=True)
+    sourceDocumentid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("documents.id",delete="CASCADE"),nullable=False,index=False)
     progress: Mapped[int] = mapped_column(
     Integer, 
     default=0, 
@@ -42,4 +42,5 @@ class ProcessingTask(Base):
             onupdate=lambda:datetime.now(timezone.utc),
             nullable=False
         )
-    status=Mapped[TaskStatus]=mapped_column(PGEnum(TaskStatus,name=""),default=TaskStatus.PENDING)
+    status=Mapped[TaskStatus]=mapped_column(PGEnum(TaskStatus,name="task_status"),default=TaskStatus.PENDING,nullable=False,index=True)
+    type=Mapped[TaskType]=mapped_column(PGEnum(TaskType,name="task_type"),nullable=False,index=True)

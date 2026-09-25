@@ -10,7 +10,7 @@ from app.models.StudyPlanItem import StudyPlanItem
 from app.models.syllabus import Syllabus
 from app.models.SyllabusUnit import SyllabusUnit
 from app.models.Topic import Topic
-from app.models.TopicFrequency import TopicFrequency
+
 from app.models.TopicPriority import TopicPriority
 from app.models.user import User
 
@@ -23,7 +23,6 @@ __all__ = [
     "Document",
     "Question",
     "QuestionTopicMatch",
-    "TopicFrequency",
     "TopicPriority",
     "StudyPlan",
     "StudyPlanItem",

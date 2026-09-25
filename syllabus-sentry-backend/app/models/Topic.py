@@ -22,7 +22,7 @@ class Topic(Base):
         index=True,
         primary_key=True
     )
-    syllabusid=Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("syllabus.id",delete="CASCADE"),nullable=False,index=True)
+    syllabus_id=Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("syllabus.id",delete="CASCADE"),nullable=False,index=True)
     name=Mapped[str]=mapped_column(String(255),nullable=False,index=True,primary_Key=True)
     unitnumber=Mapped[int]=mapped_column(Integer,nullable="false",index=True)
     description=Mapped[str]=mapped_column(String(255),nullable=False,index=True)
