@@ -2,7 +2,7 @@ from app.core.database import Base
 from uuid import UUID,uuid4
 from sqlalchemy.orm import Mapped,mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID;
-from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey
+from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey,Float
 from datetime import datetime,timezone,timedelta
 import enum
 from enum import Enum as SQLEnum
@@ -30,5 +30,6 @@ class QuestionTopicMatch(Base):
         default=MatchMethod.SEMANTIC,
         nullable=False,
     )
+    similarity_score:Mapped[float]=mapped_column(Float,nullable=False,index=True)
 
     

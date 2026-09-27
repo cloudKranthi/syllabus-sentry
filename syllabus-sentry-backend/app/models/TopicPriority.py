@@ -1,29 +1,48 @@
+import uuid
+from datetime import datetime, timezone
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
-from uuid import UUID,uuid4
-from sqlalchemy.orm import Mapped,mapped_column
-from sqlalchemy.dialects.postgresql import UUID as PGUUID;
-from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey
-from datetime import datetime,timezone,timedelta
-from enum import Enum as PGEnum
-import enum
+
+
 class TopicPriority(Base):
-    __tablename__="topicpriorities"
-    id:Mapped[UUID]=mapped_column(
+    __tablename__ = "topicpriorities"
+
+    id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True),
         nullable=False,
         primary_key=True,
-        default=uuid4
+        default=uuid.uuid4,
     )
-    topicid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("topics.id",delete="CASCADE"),nullable=False,index=True)
-    reason:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
-    priorityLevel=Mapped[int]=mapped_column(Integer,nullable=False,index=True)
-    priorityScore:Mapped[int]=mapped_column(Integer)
-    calculatedAt:Mapped[datetime]=mapped_column(
+
+    topic_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("topics.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+
+    reason: Mapped[str] = mapped_column(String(255), nullable=False)
+    priorityLevel: Mapped[str] = mapped_column(
+        String(50), nullable=False, index=True
+    )  # e.g., "HIGH", "MEDIUM", "LOW"
+    priorityScore: Mapped[float] = mapped_column(Float, default=0.0)
+
+    # Merged Frequency Fields
+    occuranceCount: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False
+    )
+    yearsAppeared: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False
+    )
+    frequencyScore: Mapped[float] = mapped_column(
+        Float, default=0.0, nullable=False
+    )
+
+    calculatedAt: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda:datetime.now(timezone.utc),
-        nullable=False
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
     )
-    frequencyScore:Mapped[int]=mapped_column(Integer)
-    yearsAppeared:Mapped[int]=mapped_column(Integer)
-    occuranceCount:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
-   

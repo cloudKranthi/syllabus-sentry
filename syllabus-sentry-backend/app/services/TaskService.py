@@ -44,7 +44,7 @@ class   TaskService:
             return tasks
     async def get_task_by_type(self,user:User,exam_name:str,type:TaskType)->list[ProcessingTask]:
         exam=await self.exam_service.get_exam_by_name(user,exam_name)
-        tasks=await self.task_repo.get_by_task_type(exam.id)
+        tasks=await self.task_repo.get_by_task_type(exam.id,type)
         return tasks
     async def delete(self,user:User,title:str,examname:str):
           document=await self.get_task_by_name(user,examname,title)
