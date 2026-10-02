@@ -35,7 +35,7 @@ class   DocumentService:
     async def get_exam_type_documents(self,user:User,exam_name:str,type:DocumentType)->list[Document]:
             exam=await self.exam_service.get_exam_by_name(user,exam_name)
             documents=await self.document_repo.get_document_by_type(exam.id,type)
-            return documents
+            return documents 
     async def get_document_by_name(self,user:User,exam_name:str,filename:str)->Document:
         exam=await self.exam_service.get_exam_by_name(user,exam_name)
         document=await self.document_repo.get_document_by_name(exam.id,filename)

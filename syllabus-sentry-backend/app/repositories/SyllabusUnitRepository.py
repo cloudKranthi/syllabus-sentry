@@ -6,7 +6,7 @@ from app.models.SyllabusUnit import SyllabusUnit
 from app.repositories.BaseRepository import BaseRepository
 
 
-class SyllabusRepository(BaseRepository[SyllabusUnit]):
+class SyllabusUnitRepository(BaseRepository[SyllabusUnit]):
 
     def __init__(self, session: AsyncSession):
         super().__init__(SyllabusUnit, session)
@@ -23,7 +23,7 @@ class SyllabusRepository(BaseRepository[SyllabusUnit]):
             .where(self.model.syllabus_id == id)
         )
         result = await self.session.execute(stmt).returning(self.model)
-        return list(result.scalar().all())
+        return list(result.scalars().all())
     
 
     

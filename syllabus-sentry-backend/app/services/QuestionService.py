@@ -44,7 +44,7 @@ class   QuestionService:
             else:
                 res.append(q)
         return res
-    async def get_question(self,user:User,examname:str,number:int)->Question:
+    async def get_question_by_number(self,user:User,examname:str,number:int)->Question:
         exam=await self.exam_service.get_exam_by_name(user,examname)
         question=await self.question_repo.get_by_exam_questionnumber(exam.id,number)
         if question is None:

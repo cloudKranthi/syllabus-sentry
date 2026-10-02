@@ -2,9 +2,10 @@ from uuid import UUID
 from app.core.database import Base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from app.core.database import Base
 from typing import Any,Generic,TypeVar,Type,Sequence
-ModelType=TypeVar("ModelType",bounds=Any)
-class BaseRepository(ModelType[Generic]):
+ModelType=TypeVar("ModelType",bound=Base)
+class BaseRepository(Generic[ModelType]):
     def __init__(self,model:Type[ModelType],session:AsyncSession):
         self.model=model
         self.session=session

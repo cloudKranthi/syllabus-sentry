@@ -5,9 +5,9 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID;
 from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey
 from datetime import datetime,timezone,timedelta
 import enum
-from enum import Enum as PGEnum
+from sqlalchemy import Enum as SQLEnum
 
-class TaskType(str, enum.Enum):
+class TaskType(str,enum.Enum):
     SYLLABUS_PARSING = "SYLLABUS_PARSING"
     PYQ_PROCESSING = "PYQ_PROCESSING"
     PLAN_GENERATION = "PLAN_GENERATION"
@@ -27,9 +27,9 @@ class ProcessingTask(Base):
         primary_key=True,
         default=uuid4
     )
-    exam_id:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",delete="CASCADE"),nullable=False,index=True)
+    exam_id:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",ondelete="CASCADE"),nullable=False,index=True)
     title:Mapped[str]=mapped_column(String(255),index=True,nullable=False,primary_key=True)
-    sourceDocumentid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("documents.id",delete="CASCADE"),nullable=False,index=False)
+    sourceDocumentid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("documents.id",ondelete="CASCADE"),nullable=False,index=False)
     progress: Mapped[int] = mapped_column(
     Integer, 
     default=0, 
@@ -42,5 +42,5 @@ class ProcessingTask(Base):
             onupdate=lambda:datetime.now(timezone.utc),
             nullable=False
         )
-    status=Mapped[TaskStatus]=mapped_column(PGEnum(TaskStatus,name="task_status"),default=TaskStatus.PENDING,nullable=False,index=True)
-    type=Mapped[TaskType]=mapped_column(PGEnum(TaskType,name="task_type"),nullable=False,index=True)
+    status:Mapped[TaskStatus]=mapped_column(SQLEnum(TaskStatus,name="task_status"),default=TaskStatus.PENDING,nullable=False,index=True)
+    type:Mapped[TaskType]=mapped_column(SQLEnum(TaskType,name="task_type"),nullable=False,index=True)

@@ -30,10 +30,11 @@ class SyllabusService:
         syllabus=Syllabus(examid=exam.id,title=title,sourceDocuemntid=document.id)
         res=await self.syllabus_repo.create(syllabus)
         return res
-    async def create_syllabus_units(self,examname:str,user:User,title:str,unitName:str,unitNumber:int,descreption:str)->list[SyllabusUnit]:
+    async def create_syllabus_unit(self,examname:str,user:User,title:str,unitName:str,unitNumber:int,description:str)->SyllabusUnit:
         exam=await self.exam_service.get_exam_by_name(user,examname)
         syllabus=await self.syllabus_repo.get_by_name(exam.id,title)
-        syllabusUnit=await self.syllabus_unit_repo.get_all_syllabus(syllabus.id)
+        new=SyllabusUnit(syllabus_id=syllabus.id,unitName=unitName,description=description)
+        syllabusUnit=await self.syllabus_unit_repo.create(new)
         return syllabusUnit
     async def getTopicByName(self,user:User,examname:str,title:str,TopicName:str)->Topic:
         exam=await self.exam_service.get_exam_by_name(user,examname)

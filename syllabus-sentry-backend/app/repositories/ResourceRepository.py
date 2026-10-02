@@ -18,7 +18,7 @@ class ResourceRepository(BaseRepository[Resource]):
             .where(self.model.topicid == id)
         )
         result = await self.session.execute(stmt)
-        return list(result.scalar().all())
+        return list(result.scalars().all())
     
                 
 

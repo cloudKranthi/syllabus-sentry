@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped,mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID;
 from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey,Float
 from datetime import datetime,timezone,timedelta
-from enum import Enum as PGEnum
+from sqlalchemy import Enum as SQLEnum
 import enum
 
 class PlanItemPriority(str, enum.Enum):
@@ -23,18 +23,18 @@ class StudyPlanItem(Base):
     __tablename__ = "study_plan_items"
 
     id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4
+        PGUUID(as_uuid=True), primary_key=True, default=uuid4
     )
 
     study_plan_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True),
+        PGUUID(as_uuid=True),
         ForeignKey("studyplans.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     topic_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True),
+        PGUUID(as_uuid=True),
         ForeignKey("topics.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -48,7 +48,7 @@ class StudyPlanItem(Base):
 
     # Computed priority level for this run
     priority: Mapped[PlanItemPriority] = mapped_column(
-        PGEnum(
+        SQLEnum(
             PlanItemPriority,
             name="plan_item_priority_enum",
             native_enum=False,
@@ -66,7 +66,7 @@ class StudyPlanItem(Base):
 
     # Student completion status
     status: Mapped[StudyItemStatus] = mapped_column(
-        PGEnum(
+        SQLEnum(
             StudyItemStatus,
             name="study_item_status_enum",
             native_enum=False,

@@ -5,9 +5,12 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.auth import router as auth_router
 import app.models.user;
+from app.services.ToolsCreation import AgentDeps
+from app.services import *
 from app.schemas.auth import UserRegisterResponse
 from app.models.user import User
 from app.api.deps import validateUser
+from app.api.ChatRoute import ChatRoute
 @asynccontextmanager
 async def lifespan(app:FastAPI):
    async with engine.begin() as conn:
@@ -41,4 +44,6 @@ async def connection_check(db:AsyncSession=Depends(get_db)) :
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database connection error: {str(e)}"
         )
+
 app.include_router(auth_router)
+app.include_router(ChatRoute)

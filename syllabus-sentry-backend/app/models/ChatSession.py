@@ -17,7 +17,7 @@ class ChatSession(Base):
     user_id:Mapped[UUID]=mapped_column(
         PGUUID(as_uuid=True),ForeignKey("users.id",ondelete="CASCADE"),nullable=False,index=True)
     exam_id:Mapped[UUID]=mapped_column(
-        PGUUID(as_uuid=True),ForeignKey("exams.id",ondelete="CASCADE"),nullable=False,index=True)
+        PGUUID(as_uuid=True),ForeignKey("exams.id",ondelete="CASCADE"),nullable=True,index=True)
     title:Mapped[str]=mapped_column(String(255),nullable=False,index=True)
     created_at:Mapped[datetime]=mapped_column(
             DateTime(timezone=True),

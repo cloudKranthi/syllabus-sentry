@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID;
 from sqlalchemy import String,Boolean,DateTime,Integer,ForeignKey,Float
 from datetime import datetime,timezone,timedelta
 import enum
-from enum import Enum as SQLEnum
+from sqlalchemy import Enum as SQLEnum
 class MatchMethod(str, enum.Enum):
     SEMANTIC = "SEMANTIC"  # Pure embedding vector similarity (e.g., cosine)
     LLM_VERIFIED = "LLM_VERIFIED"  # Vector retrieval followed by LLM confirmation
@@ -19,8 +19,8 @@ class QuestionTopicMatch(Base):
         primary_key=True,
         default=uuid4
     )
-    questionid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("questions.id",delete="CASCADE"),nullable=False,index=True)
-    topicid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("topics.id",delete="CASCADE"),nullable=False,index=True)
+    questionid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("questions.id",ondelete="CASCADE"),nullable=False,index=True)
+    topicid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("topics.id",ondelete="CASCADE"),nullable=False,index=True)
     match_method: Mapped[MatchMethod] = mapped_column(
         SQLEnum(
             MatchMethod,

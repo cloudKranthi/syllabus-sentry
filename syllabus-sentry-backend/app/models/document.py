@@ -25,7 +25,7 @@ class Document(Base):
         primary_key=True,
         default=uuid4
     )
-    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",delete="CASCADE"),nullable=False,index=True)
+    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",ondelete="CASCADE"),nullable=False,index=True)
     filename:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     storagePath:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     uploadedAt:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=datetime.now(timezone.utc),nullable=False)

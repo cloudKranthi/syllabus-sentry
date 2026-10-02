@@ -17,7 +17,7 @@ class QuestionRepository(BaseRepository[Question]):
             .where(self.model.exam_id == id)
         )
         result = await self.session.execute(stmt)
-        return list(result.scalar().all())
+        return list(result.scalars().all())
     async def get_by_exam_questionnumber(self,id:UUID,did:UUID,number:int)->Question|None:
         stmt=(select(self.model).where(self.model.exam_id==id,self.model.questionNumber==number))
         result =await self.session.execute(stmt).returning(self.model)

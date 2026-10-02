@@ -15,7 +15,7 @@ class StudyPlan(Base):
         primary_key=True,
         default=uuid4
     )
-    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",delete="CASCADE"),nullable=False,index=True)
+    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",ondelete="CASCADE"),nullable=False,index=True)
     version:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     totalAvailableHours:Mapped[int]=mapped_column(Integer,index=True,nullable=False)
     generatedAt_at:Mapped[datetime]=mapped_column(

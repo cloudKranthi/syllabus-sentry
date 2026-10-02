@@ -13,12 +13,12 @@ class Question(Base):
         primary_key=True,
         default=uuid4
     )
-    documentid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("documents.id",delete="CASCADE"),nullable=False,index=True)
-    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",delete="CASCADE"),nullable=False,index=True)
+    documentid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("documents.id",ondelete="CASCADE"),nullable=False,index=True)
+    examid:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("exams.id",ondelete="CASCADE"),nullable=False,index=True)
     questionText:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
-    questionNumber=Mapped[int]=mapped_column(Integer,nullable=False,index=True)
+    questionNumber:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
     year:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
     marks:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
-    pageNumber:Mapped[int]=mapped_column(Integer,nullable=True)
+    pageNumber:Mapped[int|None]=mapped_column(Integer,nullable=True)
 
     

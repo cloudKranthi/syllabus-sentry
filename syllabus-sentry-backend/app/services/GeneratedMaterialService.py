@@ -10,7 +10,7 @@ from fastapi import HTTPException,status
 @dataclass
 class GeneratedMaterialService:
     exam_service:ExamService
-    syllabus_service:SyllabusService
+    syllabus_service:SyllabusService 
     generated_repo:GeneratedMaterialRepository
     async def create_material(self,user:User,examname:str,material_tile:str,content:Text,type:MaterialType)->GeneratedMaterial:
         exam=await self.exam_service.get_exam_by_name(user,examname)
