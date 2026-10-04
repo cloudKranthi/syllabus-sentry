@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.ChatMessage import ChatMessage, Role
 from app.models.ChatSession import ChatSession
 from app.models.user import User
+from app.repositories.UserRepository import UserRepository
 from app.repositories.ChatMessageRepository import ChatMessageRepository
 from app.repositories.ChatSessionRepository import ChatSessionRepository
 from app.services.ToolsCreation import AgentDeps, exam_agent
@@ -24,6 +25,7 @@ class ChatService:
     session: AsyncSession
     message_repo: ChatMessageRepository
     chat_session_repo: ChatSessionRepository
+    user_repo:UserRepository
 
     SYSTEM_INSTRUCTION: str = (
         "You are an expert academic exam prep assistant. You help students plan their study hours, "
@@ -31,7 +33,12 @@ class ChatService:
         "Always rely on the tools provided to access exam details and database records. "
         "Never guess or hallucinate stats."
     )
-
+    async def find_session(self,user:User,session_title:str)->ChatSession|None:
+        s=await self.chat_session_repo.get_by_userid_title(user.id,session_title)
+        return s
+    async def update_session(self,user:User,session_title:str,eid:UUID)->ChatSession:
+        s=await self.chat_session_repo.update_exam(user.id,session_title,eid)
+        return s
     async def create_session(
         self, user: User, exam_id: UUID | None, title: str
     ) -> ChatSession:
@@ -65,10 +72,9 @@ class ChatService:
             user.id, sessionTitle
         )
         if not session:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Chat session not found or access denied.",
-            )
+            s=ChatSession(title=sessionTitle,user_id=user.id)
+            session=await self.chat_session_repo.create(s)
+            await self.session.commit()
 
         # 2. Pull system messages and historical conversation turns
         system_msgs = await self.message_repo.getSystemMessages(session.id)
@@ -111,7 +117,7 @@ class ChatService:
             message_history=message_history,
             deps=agentDeps,
         )
-        reply_text = str(result.data)
+        reply_text = str(result.output)
 
         # 6. Save assistant response to DB
         assistant_message = ChatMessage(

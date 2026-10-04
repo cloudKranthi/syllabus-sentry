@@ -10,7 +10,7 @@ from app.services import *
 from app.schemas.auth import UserRegisterResponse
 from app.models.user import User
 from app.api.deps import validateUser
-from app.api.ChatRoute import ChatRoute
+from app.api.ChatRoute import chatrouter
 @asynccontextmanager
 async def lifespan(app:FastAPI):
    async with engine.begin() as conn:
@@ -46,4 +46,4 @@ async def connection_check(db:AsyncSession=Depends(get_db)) :
         )
 
 app.include_router(auth_router)
-app.include_router(ChatRoute)
+app.include_router(chatrouter)

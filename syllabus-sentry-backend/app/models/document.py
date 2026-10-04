@@ -29,7 +29,7 @@ class Document(Base):
     filename:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     storagePath:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     uploadedAt:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=datetime.now(timezone.utc),nullable=False)
-    type:Mapped[DocumentType]=mapped_column(SQLEnum(DocumentType,name="document_type_enum"),nullable=False)
-    status:Mapped[DocumentProcessingStatus]=mapped_column(SQLEnum(DocumentProcessingStatus,name="document_processing_status_enum"),default=DocumentProcessingStatus.PENDING,nullable=False)
+    type:Mapped[DocumentType]=mapped_column(SQLEnum(DocumentType,name="document_type_enum",native_enum=False),nullable=False)
+    status:Mapped[DocumentProcessingStatus]=mapped_column(SQLEnum(DocumentProcessingStatus,name="document_processing_status_enum",native_enum=False),default=DocumentProcessingStatus.PENDING,nullable=False)
     
 

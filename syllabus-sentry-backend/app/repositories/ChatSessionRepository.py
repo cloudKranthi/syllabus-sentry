@@ -1,5 +1,5 @@
 from uuid import UUID
-from sqlalchemy import select
+from sqlalchemy import select,update
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.ChatSession import ChatSession
 from app.repositories.BaseRepository import BaseRepository
@@ -21,3 +21,7 @@ class ChatSessionRepository(BaseRepository[ChatSession]):
         stmt=(select(self.model).where(self.model.user_id==id).order_by(ChatSession.created_at.desc))
         result=await self.session.execute(stmt)
         return list(result.scalars().all())
+    async def update_exam(self,id:UUID,title:str,eid:UUID)->ChatSession:
+        stmt=(update(self.model).where(self.model.user_id==id,self.model.title==title).values(exam_id=eid).returning(self.model))
+        result=await self.session.execute(stmt)
+        return result.scalar_one_or_none()

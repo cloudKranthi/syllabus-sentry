@@ -23,11 +23,11 @@ class Topic(Base):
         primary_key=True
     )
     syllabus_id:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("syllabus.id",ondelete="CASCADE"),nullable=False,index=True)
-    name:Mapped[str]=mapped_column(String(255),nullable=False,index=True,primary_key=True)
+    name:Mapped[str]=mapped_column(String(255),nullable=False,index=True,unique=True)
     unitnumber:Mapped[int]=mapped_column(Integer,nullable="false",index=True)
     description:Mapped[str]=mapped_column(String(255),nullable=False,index=True)
     estimatedHours:Mapped[int]=mapped_column(Integer,nullable="false",index=True)
-    priority:Mapped[TopicPriority]=mapped_column(SQLEnum(TopicPriority,name="topic_priority_enum",nativeEnum=True),nullable=False,default=TopicPriority.MEDIUM)
+    priority:Mapped[TopicPriority]=mapped_column(SQLEnum(TopicPriority,name="topic_priority_enum",native_enum=True),nullable=False,default=TopicPriority.MEDIUM)
     createdAt:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=datetime.now(timezone.utc),nullable=False)
 
 

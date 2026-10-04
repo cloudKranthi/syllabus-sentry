@@ -32,7 +32,7 @@ class ChatMessage(Base):
             nullable=False
         )
     role: Mapped[Role] = mapped_column(  
-        SQLEnum(Role, name="message_role_enum", native_enum=False),
+        SQLEnum(Role, name="chat_role_enum", native_enum=False),
         nullable=False,
     )
 

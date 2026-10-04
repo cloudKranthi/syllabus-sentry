@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.document import Document,DocumentProcessingStatus,DocumentType
 from app.repositories.BaseRepository import BaseRepository
 class DocumentRepository(BaseRepository[Document]):
-    def __init__(self,session:AsyncSession,document:Document):
-        super().__init__(document,session)
+    def __init__(self,session:AsyncSession):
+        super().__init__(Document,session)
     async def updatestatus(self,Document_id:UUID,status:DocumentProcessingStatus)->Document|None:
         stmt=update(Document).where(Document.id==Document_id).values(status=status)
         result=await self.session.execute(stmt).returning(self.model)

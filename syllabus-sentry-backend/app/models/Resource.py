@@ -26,6 +26,6 @@ class Resource(Base):
     url:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     source:Mapped[str]=mapped_column(String(255),index=True,nullable=False)
     relevantScore:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
-    resouceType:Mapped[ResourceType]=mapped_column(SQLEnum(ResourceType,name=""),nullable=False,index=True)
+    resouceType:Mapped[ResourceType]=mapped_column(SQLEnum(ResourceType,name="resource_type_enum",native_enum=False),nullable=False,index=True)
    
     

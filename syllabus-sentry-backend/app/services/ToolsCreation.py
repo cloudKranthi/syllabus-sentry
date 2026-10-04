@@ -12,8 +12,10 @@ from app.models.QuestionTopicMatch import MatchMethod
 from app.models.StudyPlanItem import PlanItemPriority, StudyItemStatus
 from app.models.Topic import TopicPriority
 from app.models.user import User
-
+from app.repositories.ChatMessageRepository import ChatMessageRepository
+from app.repositories.ChatSessionRepository import ChatSessionRepository
 # Services
+from pydantic_ai.providers.openai import OpenAIProvider
 from app.services.DocumentService import DocumentService
 from app.services.ExamService import ExamService
 from app.services.GeneratedMaterialService import GeneratedMaterialService
@@ -37,22 +39,30 @@ class AgentDeps:
     generated_material_service: GeneratedMaterialService
     topic_match_service: TopicMatchService
     topic_priority_service: TopicPriorityService
+    chat_message_repo:ChatMessageRepository
+    chat_session_repo:ChatSessionRepository
 
 
-# 2. Local LLM Runner
-ollama_model = OpenAIChatModel(
-    model_name="llama3.1:8b",
+
+ollama_provider = OpenAIProvider(
     base_url="http://localhost:11434/v1",
     api_key="ollama",
 )
 
+# 2. Pass the provider to OpenAIChatModel
+ollama_model = OpenAIChatModel(
+    model_name="llama3.1:8b",
+    provider=ollama_provider,
+)
 exam_agent = Agent(
     model=ollama_model,
     deps_type=AgentDeps,
     system_prompt=(
-        "You are an expert exam preparation assistant. Use the provided tools to manage exams, "
-        "inspect syllabus hierarchies, track documents, evaluate PYQ coverage, and update study plans. "
-        "Never invent details or statistics; always call the corresponding tool."
+        "You are an expert academic mentor and exam preparation assistant. "
+        "You help students organize study schedules, give actionable study advice, and manage syllabus workflows. "
+        "When performing concrete actions—such as creating an exam, querying questions, updating study plans, "
+        "or inspecting syllabus details—always call the appropriate tool. "
+        "For general study tips, strategy discussions, or explanations, answer directly using your academic expertise."
     ),
 )
 
@@ -82,6 +92,7 @@ async def calculate_hours(
 async def create_exam(
     ctx: RunContext[AgentDeps],
     examname: str,
+    session_title:str,
     daily_study_hours: int,
     exam_datetime: datetime,
 ) -> dict[str, Any]:
@@ -92,6 +103,9 @@ async def create_exam(
         examdate=exam_datetime,
         dailystudyhours=daily_study_hours,
     )
+    session=await ctx.deps.chat_service.find_session(ctx.deps.user,session_title)
+    if not session:
+        s=await ctx.deps.chat_service.update_session(ctx.deps.user,session_title,exam.id)
     return {
         "status": "success",
         "exam_id": str(exam.id),

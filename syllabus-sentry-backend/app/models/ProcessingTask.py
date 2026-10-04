@@ -42,5 +42,5 @@ class ProcessingTask(Base):
             onupdate=lambda:datetime.now(timezone.utc),
             nullable=False
         )
-    status:Mapped[TaskStatus]=mapped_column(SQLEnum(TaskStatus,name="task_status"),default=TaskStatus.PENDING,nullable=False,index=True)
-    type:Mapped[TaskType]=mapped_column(SQLEnum(TaskType,name="task_type"),nullable=False,index=True)
+    status:Mapped[TaskStatus]=mapped_column(SQLEnum(TaskStatus,name="task_status",native_enum=False),default=TaskStatus.PENDING,nullable=False,index=True)
+    type:Mapped[TaskType]=mapped_column(SQLEnum(TaskType,name="task_type",native_enum=False),nullable=False,index=True)

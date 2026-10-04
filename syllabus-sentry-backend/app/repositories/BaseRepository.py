@@ -11,9 +11,10 @@ class BaseRepository(Generic[ModelType]):
         self.session=session
     async def get_by_id(self,uuid:UUID)->ModelType|Any:
         return await self.session.get(self.model,uuid)
-    async def create(self,**kwargs:Any)->ModelType:
-        instance=self.model(**kwargs)
-        await self.session.add(instance)
+    async def create(self,instance: ModelType | None = None,**kwargs:Any)->ModelType:
+        if instance is None:
+         instance=self.model(**kwargs)
+        self.session.add(instance)
         await self.session.flush()
         await self.session.refresh(instance)
         return instance

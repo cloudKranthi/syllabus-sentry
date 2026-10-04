@@ -9,9 +9,9 @@ from app.repositories.TopicRepository import TopicRepository
 from app.services.QuestionService import QuestionService
 from app.models.user import User
 from app.models import Syllabus
-from app.services import SyllabusService
+from app.services.SyllabusService import SyllabusService
 from app.repositories.QuestionRepository import QuestionRepository
-from app.services import DocumentService
+from app.services.DocumentService import DocumentService
 from uuid import UUID
 from fastapi import HTTPException,status
 @dataclass
