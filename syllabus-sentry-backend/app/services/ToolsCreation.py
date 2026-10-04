@@ -4,8 +4,8 @@ from typing import Any
 from uuid import UUID
 
 from pydantic_ai import Agent, RunContext
-from pydantic_ai.models.openai import OpenAIChatModel
-
+from pydantic_ai.models.ollama import OllamaModel
+from pydantic_ai.providers.ollama import OllamaProvider
 from app.models.document import DocumentProcessingStatus, DocumentType
 from app.models.GeneratedMaterial import MaterialType
 from app.models.QuestionTopicMatch import MatchMethod
@@ -44,15 +44,15 @@ class AgentDeps:
 
 
 
-ollama_provider = OpenAIProvider(
-    base_url="http://localhost:11434/v1",
-    api_key="ollama",
+ollama_provider = OllamaProvider(
+    base_url="http://localhost:11434/v1"
 )
 
 # 2. Pass the provider to OpenAIChatModel
-ollama_model = OpenAIChatModel(
+ollama_model = OllamaModel(
     model_name="llama3.1:8b",
-    provider=ollama_provider,
+    provider=ollama_provider
+
 )
 exam_agent = Agent(
     model=ollama_model,
@@ -103,9 +103,9 @@ async def create_exam(
         examdate=exam_datetime,
         dailystudyhours=daily_study_hours,
     )
-    session=await ctx.deps.chat_service.find_session(ctx.deps.user,session_title)
+    session=await ctx.deps.chat_session_repo.get_by_userid_title(ctx.deps.user.id,session_title)
     if not session:
-        s=await ctx.deps.chat_service.update_session(ctx.deps.user,session_title,exam.id)
+        s=await ctx.deps.chat_session_repo.update_exam(ctx.deps.user.id,session_title,exam.id)
     return {
         "status": "success",
         "exam_id": str(exam.id),
