@@ -13,6 +13,7 @@ from app.models.document import DocumentProcessingStatus
 @dataclass
 class   DocumentService:
     document_repo:DocumentRepository
+
     exam_service:ExamService
     db:AsyncSession
     async def transition_document_status(self,document_id: UUID, st: DocumentProcessingStatus) -> Document:
@@ -38,12 +39,11 @@ class   DocumentService:
             return documents 
     async def get_document_by_name(self,user:User,exam_name:str,filename:str)->Document:
         exam=await self.exam_service.get_exam_by_name(user,exam_name)
-        document=await self.document_repo.get_document_by_name(exam.id,filename)
+        document=await self.document_repo.get_document_by_name(filename,exam.id)
         if document is None:
-             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="No such document present")
+             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="No such document present")
         return document
     async def delete(self,user:User,exam_name:str,filename:str):
-          exam=await self.exam_service.get_exam_by_name(user,exam_name)
           document=await self.get_document_by_name(user,exam_name,filename)
           await self.document_repo.delete(document)
 

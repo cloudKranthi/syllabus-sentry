@@ -15,8 +15,6 @@ class BaseRepository(Generic[ModelType]):
         if instance is None:
          instance=self.model(**kwargs)
         self.session.add(instance)
-        await self.session.flush()
-        await self.session.refresh(instance)
         return instance
     async def delete(self,instance:ModelType)->None:
         await self.session.delete(instance)

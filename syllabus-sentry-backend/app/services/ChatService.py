@@ -116,6 +116,7 @@ class ChatService:
             prompt,
             message_history=message_history,
             deps=agentDeps,
+            model_settings={"temperature": 0.0},
         )
         reply_text = str(result.output)
 

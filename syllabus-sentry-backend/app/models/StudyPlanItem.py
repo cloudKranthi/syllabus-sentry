@@ -27,17 +27,17 @@ class StudyPlanItem(Base):
     )
 
     study_plan_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
-        ForeignKey("studyplans.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-
-    topic_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
-        ForeignKey("topics.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
+        PGUUID(as_uuid=True),                              
+        ForeignKey("studyplans.id", ondelete="CASCADE"),          
+        nullable=False,                       
+        index=True,                                      
+    )           
+                                                  
+    topic_id: Mapped[UUID] = mapped_column(                    
+        PGUUID(as_uuid=True),                                   
+        ForeignKey("topics.id", ondelete="CASCADE"),                  
+        nullable=False,                                           
+        index=True,                                            
     )
 
     # Time budget allocated to this topic by the deterministic planner

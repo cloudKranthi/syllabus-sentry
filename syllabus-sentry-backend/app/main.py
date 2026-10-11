@@ -11,12 +11,19 @@ from app.schemas.auth import UserRegisterResponse
 from app.models.user import User
 from app.api.deps import validateUser
 from app.api.ChatRoute import chatrouter
+import app.models
 @asynccontextmanager
 async def lifespan(app:FastAPI):
    async with engine.begin() as conn:
      await conn.run_sync(Base.metadata.create_all)
    yield
 app=FastAPI(title="Syllabus_Sentry",lifespan=lifespan)
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    async with engine.begin() as conn:
+      await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+      await conn.run_sync(Base.metadata.create_all)
+    yield
 
 
 @app.get("/health")
@@ -44,6 +51,7 @@ async def connection_check(db:AsyncSession=Depends(get_db)) :
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database connection error: {str(e)}"
         )
+  
 
 app.include_router(auth_router)
 app.include_router(chatrouter)

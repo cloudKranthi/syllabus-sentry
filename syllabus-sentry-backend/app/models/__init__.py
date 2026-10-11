@@ -10,7 +10,7 @@ from app.models.StudyPlanItem import StudyPlanItem
 from app.models.syllabus import Syllabus
 from app.models.SyllabusUnit import SyllabusUnit
 from app.models.Topic import Topic
-
+from app.models.DocumentEmbedding import DocumentEmbedding
 from app.models.TopicPriority import TopicPriority
 from app.models.user import User
 
@@ -29,4 +29,5 @@ __all__ = [
     "GeneratedMaterial",
     "Resource",
     "ProcessingTask",
+    "DocumentEmbedding"
 ]

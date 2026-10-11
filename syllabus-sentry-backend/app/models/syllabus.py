@@ -17,7 +17,7 @@ class Syllabus(Base):
         primary_key=True,
         default=uuid4,
     )
-    examid: Mapped[UUID] = mapped_column(
+    exam_id: Mapped[UUID] = mapped_column(
         PGUUID(as_uuid=True),
         ForeignKey("exams.id", ondelete="CASCADE"),
         nullable=False,

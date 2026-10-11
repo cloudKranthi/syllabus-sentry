@@ -14,7 +14,7 @@ class SyllabusUnitRepository(BaseRepository[SyllabusUnit]):
             select(self.model)
             .where(
                 self.model.syllabus_id == id,
-                self.model.UnitName == title,
+                self.model.unit_name == title,
             )
         )
         result = await self.session.execute(stmt)

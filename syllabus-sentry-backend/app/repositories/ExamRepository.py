@@ -15,7 +15,7 @@ class ExamRepository(BaseRepository[Exam]):
     async def get_by_name(self,id:UUID, name: str) -> Exam|None:
         stmt = (
             select(self.model)
-            .where(self.model.user_id == id,self.model.name==name)
+            .where(self.model.user_id == id,self.model.name==name).limit(1)
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()

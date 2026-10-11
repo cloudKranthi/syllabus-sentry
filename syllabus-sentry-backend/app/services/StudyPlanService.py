@@ -26,15 +26,14 @@ class StudyPlanService:
         exam=await self.examService.get_exam_by_name(user,examname)
         new=StudyPlan(examid=exam.id,version=version,totalAvailableHours=exam.availableStudyHours)
         res=await self.studyplanrepo.create(new)
-        await self.studyplanrepo.session.commit(res)
+        await self.studyplanrepo.session.commit()
         return res
     async def generate_plan_item(self,user:User,examname:str,syllabus_title:str,topic_tilte:str,plannedHours:float,sequence_order:int,priority:PlanItemPriority,status:StudyItemStatus)->StudyPlanItem:
         item=await self.get_active_plan(user,examname)
         topic=await self.syllabusService.getTopicByName(user,examname,syllabus_title,topic_tilte)
-        new=StudyPlanItem(item_id=item.id,topic_id=topic.id,plannedHours=plannedHours,sequence_order=sequence_order,priority=priority,status=status)
+        new=StudyPlanItem(study_plan_id=item.id,topic_id=topic.id,planned_hours=plannedHours,sequence_order=sequence_order,priority=priority,status=status)
         res=await self.studyplanitemrepo.create(new)
         return res
-
 
     async def update_plan_item_status(self,user:User,examname:str, status: StudyItemStatus) -> StudyPlanItem:
         item=await self.get_active_plan(user,examname)

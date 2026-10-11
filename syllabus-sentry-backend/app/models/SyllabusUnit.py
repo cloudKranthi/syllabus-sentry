@@ -14,8 +14,8 @@ class SyllabusUnit(Base):
         primary_key=True
     )
     syllabus_id:Mapped[UUID]=mapped_column(PGUUID(as_uuid=True),ForeignKey("syllabus.id",ondelete="CASCADE"),nullable=False,index=True)
-    UnitName:Mapped[str]=mapped_column(String(255),nullable=False,index=True,unique=True)
-    unitnumber:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
+    unit_name:Mapped[str]=mapped_column(String(255),nullable=False,index=True,unique=True)
+    unit_number:Mapped[int]=mapped_column(Integer,nullable=False,index=True)
     description:Mapped[str]=mapped_column(String(255),nullable=False,index=True)
     
 
