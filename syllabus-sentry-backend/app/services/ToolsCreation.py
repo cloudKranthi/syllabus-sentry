@@ -1,19 +1,25 @@
 from __future__ import annotations
-
+from pydantic_ai.models.openai import OpenAIChatModel
+from app.core.config import settings
+from pydantic_ai import Agent
 from dataclasses import dataclass
 from datetime import datetime
+import os
 from typing import Any
+from fastapi import UploadFile
 from uuid import UUID
-
+from typing import Optional
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.providers.ollama import OllamaProvider
-
+from openai import AsyncOpenAI
+from pydantic_ai.models.openai import OpenAIChatModel
 from app.models.document import DocumentProcessingStatus, DocumentType
 from app.models.GeneratedMaterial import MaterialType
 from app.models.QuestionTopicMatch import MatchMethod
 from app.models.StudyPlanItem import PlanItemPriority, StudyItemStatus
 from app.models.Topic import TopicPriority
+from app.models.DocumentEmbedding import DocumentEmbedding
 from app.models.user import User
 from app.repositories.ChatMessageRepository import ChatMessageRepository
 from app.repositories.ChatSessionRepository import ChatSessionRepository
@@ -28,9 +34,11 @@ from app.services.SyllabusService import SyllabusService
 from app.services.TaskService import TaskService
 from app.services.TopicMatchService import TopicMatchService
 from app.services.TopicPriorityService import TopicPriorityService
+from app.services.DocuemntIngestionService import DocumentIngestionService
 
-
-# =====================================================================
+os.environ["OPENAI_BASE_URL"] = settings.OPENAI_BASE_URL
+os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
+# ====================================================================
 # AGENT DEPENDENCIES & INITIALIZATION
 # =====================================================================
 
@@ -47,26 +55,27 @@ class AgentDeps:
     topic_priority_service: TopicPriorityService
     chat_message_repo: ChatMessageRepository
     chat_session_repo: ChatSessionRepository
+    document_ingestion_service:DocumentIngestionService
+    uploaded_file: Optional[UploadFile] = None
 
 
-ollama_provider = OllamaProvider(base_url="http://localhost:11434/v1")
 
-ollama_model = OllamaModel(
-    model_name="llama3.1:8b",
-    provider=ollama_provider,
+ollama_client = AsyncOpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama",  # dummy key required by the client
 )
-
+model = OpenAIChatModel("gpt-4o-mini")
 exam_agent = Agent(
-    model=ollama_model,
+    model=model,
     deps_type=AgentDeps,
     system_prompt = (
-   "You are an expert academic mentor and exam preparation assistant.\n\n"
-    "STRICT TOOL CALLING RULES:\n"
-    "1. ABSOLUTELY NEVER output JSON code blocks, function signatures, or plans describing what functions to call.\n"
-    "2. If you need to perform an action, trigger the native tool directly. Never explain your plan.\n"
-    "3. Execute only ONE tool per turn if the task involves sequential dependencies.\n"
-    "4. For querying an exam's existing status, hours, or mode, ALWAYS call `get_exam_name`.\n"
-    "5. If no registered tool fits the request, respond conversationally without mentioning tools."
+   "You are an academic exam assistant.\n"
+        "IMPORTANT RULES:\n"
+        "- When the user asks to ingest, upload, or process notes, you MUST call the `record_matches` tool.\n"
+        "- NEVER output raw JSON, code blocks, or function-call text in your message response.\n"
+        "- NEVER output `{\"type\": \"function\" ...}` or markdown containing tool schemas.\n"
+        "- Call the tool silently and reply only in plain text confirming the operation when done." \
+        "Always invoke tools when requested."
 )
 )
 
@@ -823,9 +832,63 @@ async def get_syllabus_by_name(ctx:RunContext[AgentDeps],examname:str,syllabusTi
         examname: Name of the exam (e.g., 'Operating Systems').
         syllabusTitle: Title of the registered syllabus (e.g., 'OS Core Syllabus 2026').
     """
+
     ns=await ctx.deps.syllabus_service.get_syllabus_by_name(ctx.deps.user,examname,syllabusTitle)
     return {
             "status": "success",
             "syllabus_id": str(ns.id),
             "Syllabus": ns
         }
+@exam_agent.tool
+async def record_matches(ctx:RunContext[AgentDeps],examname:str,sourceType:DocumentType,unitNumber:Optional[int]|None=None)->dict[str,Any]:
+    """Ingest and vectorize the attached PDF file into the database for a given exam.
+
+    Args:
+        examname: Name of the exam (e.g. 'Operating Systems').
+        sourceType: SYLLABUS, PYQ, ASSIGNMENT, INTERNAL_EXAM, or NOTES.
+        unitNumber: Optional unit or module number."""
+    file = ctx.deps.uploaded_file
+    if not file:
+        return {
+            "status": "failed",
+            "message": "No file was attached to this request to process.",
+        }
+
+    file_bytes = await file.read()
+    await ctx.deps.document_ingestion_service.record(ctx.deps.user,examname,sourceType,file_bytes,unitNumber)
+    return{
+        "status":"success"
+    }
+@exam_agent.tool
+async def search_with_embeddings(ctx:RunContext[AgentDeps],examname:str,question:str,unitNumber:int=None,limit:int=5)->dict[str,Any]:
+    """
+    [READ-ONLY QUERY]
+    Semantically search uploaded syllabus documents and course materials for relevant context.
+
+    WHEN TO USE:
+    - The student asks a concept, theory, or syllabus-related question for an exam.
+    - Check uploaded materials first before answering from general knowledge.
+    """
+    embeddings=await ctx.deps.document_ingestion_service.search(ctx.deps.user,examname,question,limit,unitNumber)
+    if not embeddings:
+        return {
+            "status": "empty",
+            "message": "No relevant document excerpts found in uploaded materials.",
+            "chunks": [],
+        }
+    return{
+        "status":"success",
+        "chunks": [
+            {
+                "content": item.content,
+                "unit_number": item.unit_number,
+                "chunk_index": item.chunk_index,
+                "source_type": str(item.source_type),
+            }
+            for item in embeddings
+        ]
+    }
+
+
+
+

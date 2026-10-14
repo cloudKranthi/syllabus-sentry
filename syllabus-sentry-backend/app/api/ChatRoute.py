@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status,UploadFile,File,Form
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import validateUser
 from app.services.AutoContainer import AutoContainer
 from app.core.database import get_db
 from app.models.user import User
-
+from app.services.DocuemntIngestionService import DocumentIngestionService
 from app.repositories.ChatMessageRepository import ChatMessageRepository
 from app.repositories.ChatSessionRepository import ChatSessionRepository
 from app.repositories.UserRepository import UserRepository
@@ -75,6 +76,7 @@ def get_agent_deps(
         ),
         chat_message_repo=ChatMessageRepository(db),
         chat_session_repo=ChatSessionRepository(db),
+        document_ingestion_service=container.get(DocumentIngestionService),
     )
 
 
@@ -106,16 +108,19 @@ async def start_session(
     status_code=status.HTTP_200_OK,
 )
 async def send_message(
-    payload: ChatRequest,
+    session_title: str = Form(...),
+    message: str = Form(...),
+    file: Optional[UploadFile] = File(None),
     user: User = Depends(validateUser),
     chat_service: ChatService = Depends(get_chat_service),
     agent_deps: AgentDeps = Depends(get_agent_deps),
 ):
+    agent_deps.uploaded_file = file
     reply = await chat_service.chat_process(
         user=user,
-        sessionTitle=payload.session_title,
+        sessionTitle=session_title,
         agentDeps=agent_deps,
-        prompt=payload.message,
+        prompt=message,
     )
 
     return {

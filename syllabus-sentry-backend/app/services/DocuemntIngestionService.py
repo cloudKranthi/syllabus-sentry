@@ -25,5 +25,13 @@ class DocumentIngestionService:
         new:list[DocumentEmbedding]=[DocumentEmbedding(user_id=user.id,exam_id=exam.id,source_type=sourceType,content=chunk,embedding=vector,unit_number=unit_number,chunk_index=idx)
                                      for idx,(chunk,vector) in enumerate(zip(chunks,embeddings))]
         await self.embedding_repo.save_embeddings(new)
+    async def search(self,user:User,examname:str,question:str,limit:int=5,unitNumber:Optional[int]=None)->list[DocumentEmbedding]:
+        vector=await self.er.get_embedding(question)
+        exam=await self.exam_service.get_exam_by_name(user,examname)
+        embeddings=await self.embedding_repo.search_by_similarity(user.id,exam.id,vector,unitNumber,limit)
+        return embeddings                               
+    
+    
+        
 
     

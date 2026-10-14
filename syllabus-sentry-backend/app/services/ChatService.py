@@ -28,10 +28,11 @@ class ChatService:
     user_repo:UserRepository
 
     SYSTEM_INSTRUCTION: str = (
-        "You are an expert academic exam prep assistant. You help students plan their study hours, "
-        "analyze previous year question trends, prioritize syllabus topics, and manage study materials. "
-        "Always rely on the tools provided to access exam details and database records. "
-        "Never guess or hallucinate stats."
+       "You are an academic exam preparation assistant. "
+        "When the user asks to perform an action (like creating an exam or adding units), "
+        "you MUST call the corresponding tool immediately. "
+        "Do NOT write python code, do NOT write markdown code blocks, and do NOT explain what you are going to do. "
+        "Directly invoke the tool."
     )
     async def find_session(self,user:User,session_title:str)->ChatSession|None:
         s=await self.chat_session_repo.get_by_userid_title(user.id,session_title)
