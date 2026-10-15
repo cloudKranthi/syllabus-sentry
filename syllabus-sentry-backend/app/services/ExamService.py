@@ -20,7 +20,6 @@ class ExamService:
         mode = "SURVIVAL" if calculated_hours < 15.0 else "NORMAL"
         new=Exam(user_id=user.id,name=name,examDateTime=examdate,availableStudyHours=calculated_hours,mode=mode)
         new2=await self.exam_repo.create(new)
-        await self.exam_repo.session.commit()
         return new2
     async def get_exam_by_name(self,user:User,name:str)->Exam:
         ans=await self.exam_repo.get_by_name(user.id,name)

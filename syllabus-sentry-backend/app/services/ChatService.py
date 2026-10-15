@@ -17,8 +17,8 @@ from app.models.user import User
 from app.repositories.UserRepository import UserRepository
 from app.repositories.ChatMessageRepository import ChatMessageRepository
 from app.repositories.ChatSessionRepository import ChatSessionRepository
-from app.services.ToolsCreation import AgentDeps, exam_agent
-
+from app.services.ToolsCreation import AgentDeps
+from app.services.ToolsCreation import exam_agent
 
 @dataclass
 class ChatService:
@@ -110,8 +110,8 @@ class ChatService:
             tool_call_id=None,
         )
         await self.message_repo.create(user_message)
-        await self.message_repo.session.commit()
-
+        await self.message_repo.session.flush()
+        self.message_repo.session.sync_session._flushing = False
         # 5. Run agent turn (executes tools automatically via agentDeps)
         result = await exam_agent.run(
             prompt,
@@ -131,6 +131,5 @@ class ChatService:
         )
         await self.message_repo.create(assistant_message)
         await self.message_repo.session.commit()
-
         return reply_text
             
